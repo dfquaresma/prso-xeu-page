@@ -10,7 +10,7 @@ The required tasks were:
 - The output of the programs should be on the console.
 
 ## Indicated Strategy
-An intuitive set of actions is using the Linux syscalls to control the flow of execution of the programs. In fact, for each command, a one (or more) new process should be created (e.g. with a fork), executed (the right exec only require the program name), while the shell must wait for the finish of the execution and an exit() call should be done. In case that we decide to implement the extra tasks [not described here], a syscall like pipe() or another would be called.
+An intuitive set of actions is using the Linux syscalls to control the flow of execution of the programs. In fact, for each program, a one (or more) new process should be created (e.g. with a fork), executed (the right exec only require the program name), while the shell must wait for the finish of the execution and an exit() call should be done. In case that we decide to implement the extra tasks [not described here], a syscall like pipe() or another would be called.
 
 ## How compile and execute 
 ```bash
