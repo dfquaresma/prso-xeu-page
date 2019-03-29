@@ -5,6 +5,10 @@
 #include <cstdio>
 #include <sstream>
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 using namespace xeu_utils;
 using namespace std;
 
@@ -87,15 +91,33 @@ void commands_explanation(const vector<Command>& commands) {
   }
 }
 
+int run_input() {
+  const vector<Command> commands = StreamParser().parse().commands();
+
+  int status;
+  if (commands[0].name() == "exit") {
+    status = -1;
+  } else {
+    if (!fork()) {
+      execvp(commands[0].filename(), commands[0].argv());
+    };
+    wait(&status);
+  }
+
+  return status;
+}
+
 int main() {
   // Waits for the user to input a command and parses it. Commands separated
   // by pipe, "|", generate multiple commands. For example, try to input
   //   ps aux | grep xeu
   // commands.size() would be 2: (ps aux) and (grep xeu)
   // If the user just presses ENTER without any command, commands.size() is 0
-  const vector<Command> commands = StreamParser().parse().commands();
+  //const vector<Command> commands = StreamParser().parse().commands();
 
-  commands_explanation(commands);
+  //commands_explanation(commands);
+
+  while (run_input() != -1);
 
   return 0;
 }
