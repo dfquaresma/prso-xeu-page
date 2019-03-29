@@ -9,6 +9,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include <errno.h>
+#include <string.h>
+
 using namespace xeu_utils;
 using namespace std;
 
@@ -93,18 +96,26 @@ void commands_explanation(const vector<Command>& commands) {
 
 int run_input() {
   const vector<Command> commands = StreamParser().parse().commands();
+  printf("$ ");
 
-  int status;
-  if (commands[0].name() == "exit") {
-    status = -1;
-  } else {
-    if (!fork()) {
-      execvp(commands[0].filename(), commands[0].argv());
-    };
-    wait(&status);
+  int ret;
+  for (int i = 0; i < commands.size(); i++) {
+    int status;
+    Command command = commands[i];
+    if (command.name() == "exit") {
+      ret = -1;
+      break;
+
+    } else {
+      if (fork() == 0) {
+        execvp(command.filename(), command.argv());
+        printf("Err %s", strerror(errno));
+      }
+      wait(&status);
+    }
   }
 
-  return status;
+  return ret;
 }
 
 int main() {
