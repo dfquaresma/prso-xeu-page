@@ -47,6 +47,11 @@ char* const* Command::argv() const {
   return &argv_[0];
 }
 
+void Command::remove_last() {
+  argv_.pop_back();
+  args_.pop_back(); 
+}
+
 std::string Command::name() const {
   return args_.empty() ? "" : args_[0];
 }

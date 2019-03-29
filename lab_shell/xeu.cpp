@@ -94,9 +94,16 @@ void commands_explanation(const vector<Command>& commands) {
   }
 }
 
+bool verify_background(Command c) {
+  return string(c).back() == '&';
+}
+
 void run_input() {
   printf("$ ");
   const vector<Command> commands = StreamParser().parse().commands();
+
+  bool bg = false;
+  if (commands.size() > 0) bg = verify_background(commands.back());
 
   for (int i = 0; i < commands.size(); i++) {
     int status;
@@ -104,12 +111,13 @@ void run_input() {
     if (command.name() == "exit") {
       exit(0);
 
-    } else {
+    } else { 
       if (fork() == 0) {
+        //if (bg) command.remove_last();
         execvp(command.filename(), command.argv());
-        printf("Err %s", strerror(errno));
+        printf("Err: %s\n", strerror(errno));
       }
-      wait(&status);
+      if (!bg) wait(&status);
     }
   }
 }

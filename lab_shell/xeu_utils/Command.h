@@ -82,6 +82,8 @@ struct Command {
     bool show_io=true
   );
 
+  void remove_last();
+
  private:
   std::vector<char*> argv_; // stores the data in C string format (for exec*)
   std::vector<std::string> args_; // stores the data as C++ strings
