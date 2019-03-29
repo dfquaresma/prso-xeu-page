@@ -94,17 +94,15 @@ void commands_explanation(const vector<Command>& commands) {
   }
 }
 
-int run_input() {
-  const vector<Command> commands = StreamParser().parse().commands();
+void run_input() {
   printf("$ ");
+  const vector<Command> commands = StreamParser().parse().commands();
 
-  int ret;
   for (int i = 0; i < commands.size(); i++) {
     int status;
     Command command = commands[i];
     if (command.name() == "exit") {
-      ret = -1;
-      break;
+      exit(0);
 
     } else {
       if (fork() == 0) {
@@ -114,8 +112,6 @@ int run_input() {
       wait(&status);
     }
   }
-
-  return ret;
 }
 
 int main() {
@@ -128,7 +124,7 @@ int main() {
 
   //commands_explanation(commands);
 
-  while (run_input() != -1);
+  while (true) run_input();
 
   return 0;
 }
