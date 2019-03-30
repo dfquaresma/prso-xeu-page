@@ -5,6 +5,15 @@
 #include <cstdio>
 #include <sstream>
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include <errno.h>
+#include <string.h>
+
+#include <stdlib.h>
+
 using namespace xeu_utils;
 using namespace std;
 
@@ -87,15 +96,49 @@ void commands_explanation(const vector<Command>& commands) {
   }
 }
 
+void run_input() {
+  printf("$ ");
+  const vector<Command> commands = StreamParser().parse().commands();
+  bool bg = (commands.size() > 0 && string(commands[0].filename()) == "&");
+  
+  for (int i = 0; i < commands.size(); i++) {
+    int status;
+    Command command = commands[i];
+    if (command.name() == "exit") {
+      exit(0);
+
+    } else { 
+      if (fork() == 0) {
+        const char* filename; 
+        char* const* argv;
+        if (bg) {
+          filename = command.argv()[1];
+          argv = &(command.argv()[1]);
+
+        } else {
+          filename = command.filename();
+          argv = command.argv();
+
+        }
+        execvp(filename, argv);
+        printf("Err: %s\n", strerror(errno));
+      }
+      if (!bg) wait(&status);
+    }
+  }
+}
+
 int main() {
   // Waits for the user to input a command and parses it. Commands separated
   // by pipe, "|", generate multiple commands. For example, try to input
   //   ps aux | grep xeu
   // commands.size() would be 2: (ps aux) and (grep xeu)
   // If the user just presses ENTER without any command, commands.size() is 0
-  const vector<Command> commands = StreamParser().parse().commands();
+  //const vector<Command> commands = StreamParser().parse().commands();
 
-  commands_explanation(commands);
+  //commands_explanation(commands);
+
+  while (true) run_input();
 
   return 0;
 }
