@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <string.h>
 
+#include <stdlib.h>
+
 using namespace xeu_utils;
 using namespace std;
 
@@ -94,17 +96,11 @@ void commands_explanation(const vector<Command>& commands) {
   }
 }
 
-bool verify_background(Command c) {
-  return string(c).back() == '&';
-}
-
 void run_input() {
   printf("$ ");
   const vector<Command> commands = StreamParser().parse().commands();
-
-  bool bg = false;
-  if (commands.size() > 0) bg = verify_background(commands.back());
-
+  bool bg = (commands.size() > 0 && string(commands[0].filename()) == "&");
+  
   for (int i = 0; i < commands.size(); i++) {
     int status;
     Command command = commands[i];
@@ -113,8 +109,18 @@ void run_input() {
 
     } else { 
       if (fork() == 0) {
-        //if (bg) command.remove_last();
-        execvp(command.filename(), command.argv());
+        const char* filename; 
+        char* const* argv;
+        if (bg) {
+          filename = command.argv()[1];
+          argv = &(command.argv()[1]);
+
+        } else {
+          filename = command.filename();
+          argv = command.argv();
+
+        }
+        execvp(filename, argv);
         printf("Err: %s\n", strerror(errno));
       }
       if (!bg) wait(&status);
