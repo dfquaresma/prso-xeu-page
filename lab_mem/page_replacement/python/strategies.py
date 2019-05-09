@@ -30,21 +30,21 @@ class LRU:
     lruFrame = frame
     lru = x
     self.put((frame, x))
-    	
-	for i in range(self.fila.size()):
-		(frame, x) = self.fila.get()
-		if(x < lru):
-			lruFrame = frame
-		self.put((frame, x))	
+    for i in range(self.fila.size()):
+      (frame, x) = self.fila.get()
+      if(x < lru):
+        lruFrame = frame
+        self.put((frame, x))	
 	return lruFrame				
 
   def access(self, frameId, isWrite):
-		for i in range(self.fila.size()):
-			(frame, x) = self.fila.get()
+    for i in range(self.fila.size()):
+      (frame, x) = self.fila.get()
       if frame == frameId:
-        self.put(frameId, x++)
+        x = x + 1
+        self.put(frameId, x)
       else:
-        self.put(frameId, x)]
+        self.put(frameId, x)
 
 def get_strategy(algorithm):
     if algorithm == "fifo":
