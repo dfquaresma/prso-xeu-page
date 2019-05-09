@@ -36,7 +36,10 @@ class LRU:
         lruFrame = frame
         self.put((frame, x))	
 	return lruFrame				
-
+  
+  def clock(self):
+    pass
+  
   def access(self, frameId, isWrite):
     for i in range(self.fila.size()):
       (frame, x) = self.fila.get()
