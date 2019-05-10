@@ -78,7 +78,7 @@ class LRU(Strategy):
 
     frame = self.frames[frameIndex]
     self.frames.pop(frameIndex)
-    return frame.frameId	
+    return frame.frameId  
   
   def access(self, frameId, isWrite):
     self.timer += 1
@@ -140,7 +140,8 @@ class NRU(Strategy):
         break
 
 class Aging(Strategy):
-  def __init__(self):
+  def __init__(self, nbitsAging):
+    self.nbits = nbtisAging
     self.frames = []
     self.counter = 0
     
@@ -153,7 +154,7 @@ class Aging(Strategy):
     frameIndex = 0
     minimum = self.frames[frameIndex].counter
     for i in range(len(self.frames)):
-      timer = self.frames[i].counter
+      counter = self.frames[i].counter
       if counter < minimum:
         frameIndex = i
         minimum = counter
@@ -165,14 +166,14 @@ class Aging(Strategy):
   def access(self, frameId, isWrite):
     for frame in self.frames:
       if frame.frameId == frameId:
-        frame.counter = frame.counter + 1
+        frame.counter |= 1 << (nbits- 1)
         break
  
   def clock(self):
     for frame in self.frames:
       frame.counter >> 1
 
-def get_strategy(algorithm):
+def get_strategy(algorithm, nbitsAging=None):
     if algorithm == "fifo":
         return Fifo()
     elif algorithm == "second-chance":
@@ -182,6 +183,6 @@ def get_strategy(algorithm):
     elif algorithm == "nru":
         return NRU()
     elif algorithm == "aging":
-        return Aging()
+        return Aging(nbtisAging)
     else:
         raise Exception(algorithm + " strategy not implemented")
