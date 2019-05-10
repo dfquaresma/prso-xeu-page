@@ -78,7 +78,7 @@ class LRU(Strategy):
 
     frame = self.frames[frameIndex]
     self.frames.pop(frameIndex)
-    return frame.frameId  
+    return frame.frameId
   
   def access(self, frameId, isWrite):
     self.timer += 1
