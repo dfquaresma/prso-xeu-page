@@ -163,8 +163,8 @@ class Aging(Strategy):
     for frame in self.frames:
       if frame.frameId == frameId:
         leftbit = 2 ** self.nbits
-        if frame.counter < leftbit:
-          frame.counter ^= 2 ** self.nbits
+
+        frame.counter |= leftbit
         break
  
   def clock(self):
