@@ -140,11 +140,10 @@ class Aging(Strategy):
   def __init__(self, nbitsAging):
     self.nbits = nbitsAging
     self.frames = []
-    self.counter = 0
     
   def put(self, frameId):
     frame = Frame(frameId)
-    frame.counter = self.counter
+    frame.counter = 1
     self.frames.append(frame)
 
   def evict(self):
@@ -163,13 +162,13 @@ class Aging(Strategy):
   def access(self, frameId, isWrite):
     for frame in self.frames:
       if frame.frameId == frameId:
-        frame.counter |= 1 << (self.nbits- 1)
+        frame.counter += 2 ** self.nbits
         break
  
   def clock(self):
     for frame in self.frames:
-      frame.counter >> 1
-
+      frame.counter /= 2
+      
 def get_strategy(algorithm, nbitsAging=None):
     if algorithm == "fifo":
         return Fifo()
