@@ -48,12 +48,10 @@ class SecondChance(Fifo):
           return frame.frameId
 
     def access(self, frameId, isWrite):
-      for i in range(len(self.fila)):
-        frame = super(SecondChance, self).evict()
+      for frame in self.fila:
         if frame.frameId == frameId:
-          self.put(frameId, 1)
-        else:
-          self.put(frameId, frame.bit)
+          frame.bit =  1
+          break
           
 class LRU(Strategy):
   def __init__(self):
@@ -142,11 +140,10 @@ class Aging(Strategy):
   def __init__(self, nbitsAging):
     self.nbits = nbitsAging
     self.frames = []
-    self.counter = 0
     
   def put(self, frameId):
     frame = Frame(frameId)
-    frame.counter = self.counter
+    frame.counter = 1
     self.frames.append(frame)
 
   def evict(self):
@@ -165,13 +162,14 @@ class Aging(Strategy):
   def access(self, frameId, isWrite):
     for frame in self.frames:
       if frame.frameId == frameId:
-        frame.counter |= 1 << (self.nbits- 1)
+        leftbit = 2 ** self.nbits
+        frame.counter |= leftbit
         break
  
   def clock(self):
     for frame in self.frames:
-      frame.counter >> 1
-
+      frame.counter >>= 1
+      
 def get_strategy(algorithm, nbitsAging=None):
     if algorithm == "fifo":
         return Fifo()
