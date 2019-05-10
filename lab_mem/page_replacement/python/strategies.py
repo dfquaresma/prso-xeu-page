@@ -163,7 +163,6 @@ class Aging(Strategy):
     for frame in self.frames:
       if frame.frameId == frameId:
         leftbit = 2 ** self.nbits
-
         frame.counter |= leftbit
         break
  
