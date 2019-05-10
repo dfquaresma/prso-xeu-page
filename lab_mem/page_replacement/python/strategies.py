@@ -1,3 +1,6 @@
+from Queue import Queue
+from random import randint
+
 class Frame:
   def __init__(self, frameId):
     self.frameId = frameId
@@ -20,7 +23,6 @@ class Strategy(object):
 
 class Fifo(Strategy):
   def __init__(self):
-    from Queue import Queue
     self.fila = Queue()
 
   def put(self, frameId):
@@ -63,7 +65,7 @@ class LRU(Strategy):
     self.timer += 1
     frame = Frame(frameId)
     frame.timer = self.timer
-    self.frames.append(Frame(frameId))
+    self.frames.append(frame)
 
   def evict(self):
     frameIndex = 0
@@ -85,6 +87,58 @@ class LRU(Strategy):
         frame.timer = self.timer
         break
 
+class NRU(Strategy):
+  def __init__(self):
+    self.frames = []
+    
+  def put(self, frameId):
+    frame = Frame(frameId)
+    frame.referenced = 0
+    frame.modified = 0
+    self.frames.append(frame)
+
+  def evict(self):
+    if not self.frames:
+      raise Exception("[NRU] There is no frame to evict")
+
+    c0, c1, c2, c3 = [], [], [], []
+    for frame in self.frames:
+      if frame.referenced == 0:
+        if frame.modified == 0:
+          c0.append(frame)
+        else:
+          c1.append(frame)
+      else:
+        if frame.modified == 0:
+          c2.append(frame)
+        else:
+          c3.append(frame)
+    
+    if c0:
+      frame = c0.pop(randint(0, len(c0) - 1))
+    elif c1:
+      frame = c1.pop(randint(0, len(c1) - 1))
+    elif c2:
+      frame = c2.pop(randint(0, len(c2) - 1))
+    else:
+      frame = c3.pop(randint(0, len(c3) - 1))
+    
+    index = self.frames.index(frame)
+    self.frames.pop(index)
+    return frame.frameId
+
+  def clock(self):
+    for frame in self.frames:
+      frame.referenced = 0
+  
+  def access(self, frameId, isWrite):
+    for frame in self.frames:
+      if frame.frameId == frameId:
+        frame.referenced = 1
+        if isWrite:
+          frame.modified = 1
+        break
+
 def get_strategy(algorithm):
     if algorithm == "fifo":
         return Fifo()
@@ -92,5 +146,7 @@ def get_strategy(algorithm):
         return SecondChance()
     elif algorithm == "lru":
         return LRU()
+    elif algorithm == "nru":
+        return NRU()
     else:
         raise Exception(algorithm + " strategy not implemented")
