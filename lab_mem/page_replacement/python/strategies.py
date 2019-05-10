@@ -48,12 +48,10 @@ class SecondChance(Fifo):
           return frame.frameId
 
     def access(self, frameId, isWrite):
-      for i in range(len(self.fila)):
-        frame = super(SecondChance, self).evict()
+      for frame in self.fila:
         if frame.frameId == frameId:
-          self.put(frameId, 1)
-        else:
-          self.put(frameId, frame.bit)
+          frame.bit =  1
+          break
           
 class LRU(Strategy):
   def __init__(self):
