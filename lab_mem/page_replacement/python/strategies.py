@@ -162,12 +162,14 @@ class Aging(Strategy):
   def access(self, frameId, isWrite):
     for frame in self.frames:
       if frame.frameId == frameId:
-        frame.counter += 2 ** self.nbits
+        leftbit = 2 ** self.nbits
+        if frame.counter < leftbit:
+          frame.counter ^= 2 ** self.nbits
         break
  
   def clock(self):
     for frame in self.frames:
-      frame.counter /= 2
+      frame.counter >>= 1
       
 def get_strategy(algorithm, nbitsAging=None):
     if algorithm == "fifo":
