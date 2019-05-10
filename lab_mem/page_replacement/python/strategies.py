@@ -1,4 +1,3 @@
-from Queue import Queue
 from random import randint
 
 class Frame:
@@ -23,13 +22,13 @@ class Strategy(object):
 
 class Fifo(Strategy):
   def __init__(self):
-    self.fila = Queue()
+    self.fila = []
 
   def put(self, frameId):
-    self.fila.put(frameId)
+    self.fila.append(frameId)
 
   def evict(self):
-    return self.fila.get()
+    return self.fila.pop(0)
 
 class SecondChance(Fifo):
     def __init__(self):
@@ -41,7 +40,7 @@ class SecondChance(Fifo):
       super(SecondChance, self).put(frame)
 
     def evict(self):
-      while not self.fila.empty():
+      while self.fila:
         frame = super(SecondChance, self).evict()
         if frame.bit == 1:
           self.put(frame.frameId)
@@ -49,7 +48,7 @@ class SecondChance(Fifo):
           return frame.frameId
 
     def access(self, frameId, isWrite):
-      for i in range(self.fila.qsize()):
+      for i in range(len(self.fila)):
         frame = super(SecondChance, self).evict()
         if frame.frameId == frameId:
           self.put(frameId, 1)
@@ -141,7 +140,7 @@ class NRU(Strategy):
 
 class Aging(Strategy):
   def __init__(self, nbitsAging):
-    self.nbits = nbtisAging
+    self.nbits = nbitsAging
     self.frames = []
     self.counter = 0
     
@@ -166,7 +165,7 @@ class Aging(Strategy):
   def access(self, frameId, isWrite):
     for frame in self.frames:
       if frame.frameId == frameId:
-        frame.counter |= 1 << (nbits- 1)
+        frame.counter |= 1 << (self.nbits- 1)
         break
  
   def clock(self):
@@ -183,6 +182,6 @@ def get_strategy(algorithm, nbitsAging=None):
     elif algorithm == "nru":
         return NRU()
     elif algorithm == "aging":
-        return Aging(nbtisAging)
+        return Aging(nbitsAging)
     else:
         raise Exception(algorithm + " strategy not implemented")
