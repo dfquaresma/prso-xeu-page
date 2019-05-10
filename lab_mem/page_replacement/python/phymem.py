@@ -15,7 +15,7 @@ class PhysicalMemory:
     assert algorithm in {"fifo", "nru", "lru", "aging", "second-chance"}
     self.algorithm = algorithm
     from strategies import get_strategy
-    self.strategy = get_strategy(self.algorithm)
+    self.strategy = get_strategy(self.algorithm, self.ALGORITHM_AGING_NBITS)
 
   def put(self, frameId):
     """Allocates this frameId for some page"""
