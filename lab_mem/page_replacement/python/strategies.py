@@ -139,6 +139,39 @@ class NRU(Strategy):
           frame.modified = 1
         break
 
+class Aging(Strategy):
+  def __init__(self):
+    self.frames = []
+    self.counter = 0
+    
+  def put(self, frameId):
+    frame = Frame(frameId)
+    frame.counter = self.counter
+    self.frames.append(frame)
+
+  def evict(self):
+    frameIndex = 0
+    minimum = self.frames[frameIndex].counter
+    for i in range(len(self.frames)):
+      timer = self.frames[i].counter
+      if counter < minimum:
+        frameIndex = i
+        minimum = counter
+
+    frame = self.frames[frameIndex]
+    self.frames.pop(frameIndex)
+    return frame.frameId    
+  
+  def access(self, frameId, isWrite):
+    for frame in self.frames:
+      if frame.frameId == frameId:
+        frame.counter = frame.counter + 1
+        break
+ 
+  def clock(self):
+    for frame in self.frames:
+      frame.counter >> 1
+
 def get_strategy(algorithm):
     if algorithm == "fifo":
         return Fifo()
@@ -148,5 +181,7 @@ def get_strategy(algorithm):
         return LRU()
     elif algorithm == "nru":
         return NRU()
+    elif algorithm == "aging":
+        return Aging()
     else:
         raise Exception(algorithm + " strategy not implemented")
