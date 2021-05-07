@@ -5,7 +5,7 @@ in the classroom.
 
 The required tasks were:
 - Modify the code in xeu.cpp to execute any program that exists on the folders with binaries.
-- Only one program can be executed at a time, which means the use of a syscall for *wait* the finish of the execution.
+- Only one program can be executed at a time, which means we need to use a syscall for *wait* the finish of the execution.
 - On the final of the execution of a program, another program can be executed.
 - The output of the programs should be on the console.
 
